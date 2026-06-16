@@ -16,6 +16,34 @@ from .dixon_coles import DixonColesModel
 from .elo import EloModel
 
 
+def _extend_to_extra_time(mat90: np.ndarray, lam: float, mu: float) -> np.ndarray:
+    """Turn a 90' score distribution into the after-extra-time (120') one.
+
+    A match level after 90' plays ~30' more (1/3 of the goal rate). Decisive
+    90' results stand; a still-level result after ET also stands (penalties are
+    excluded from the recorded score).
+    """
+    from scipy.stats import poisson
+
+    m = mat90.shape[0]
+    eh = poisson.pmf(np.arange(m), lam / 3.0)
+    ea = poisson.pmf(np.arange(m), mu / 3.0)
+    out = np.zeros_like(mat90)
+    for i in range(m):
+        for j in range(m):
+            p = mat90[i, j]
+            if p <= 0:
+                continue
+            if i != j:
+                out[i, j] += p  # decided in regulation
+            else:
+                for gh in range(m - i):      # level at 90' -> add ET goals
+                    for ga in range(m - j):
+                        out[i + gh, j + ga] += p * eh[gh] * ea[ga]
+    s = out.sum()
+    return out / s if s > 0 else out
+
+
 @dataclass
 class MatchPrediction:
     home_team: str
@@ -78,6 +106,13 @@ class Predictor:
         stage: str = "group",
     ) -> MatchPrediction:
         mat = self.dc.score_matrix(home, away, neutral)
+        # Knockout matches are decided after extra time (120'), excluding
+        # penalties — matching the prediction-league rule. If the score is level
+        # after 90', play ~30' more (1/3 of the goal rate); a still-level result
+        # stands (penalties don't count). Group games are 90' only.
+        if stage != "group":
+            lam90, mu90 = self.dc.expected_goals(home, away, neutral)
+            mat = _extend_to_extra_time(mat, lam90, mu90)
         m = mat.shape[0]
 
         # 1X2 from the score matrix
