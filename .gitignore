@@ -14,3 +14,6 @@ frontend/dist/
 
 # Claude local settings (may contain secrets in recorded commands)
 .claude/settings.local.json
+
+# logo source image (working file)
+trophy-photo.jpg
