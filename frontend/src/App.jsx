@@ -189,9 +189,11 @@ export default function App() {
                 )}
                 <div className="grid">
                   {played.matches.length === 0 && <p>עדיין לא שוחקו משחקי מונדיאל.</p>}
-                  {played.matches.map((m, i) => (
-                    <MatchCard key={`${m.date}-${m.home_team}-${i}`} match={m} />
-                  ))}
+                  {[...played.matches]
+                    .sort((a, b) => b.date.localeCompare(a.date)) // החדשים למעלה
+                    .map((m, i) => (
+                      <MatchCard key={`${m.date}-${m.home_team}-${i}`} match={m} />
+                    ))}
                 </div>
               </div>
             )}
