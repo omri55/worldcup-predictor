@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 */12 * * *" # רענון אוטומטי כל 12 שעות
+    - cron: "0 */6 * * *" # רענון אוטומטי כל 6 שעות במהלך המונדיאל
   workflow_dispatch: {} # אפשרות להריץ ידנית מ-GitHub
 
 permissions:
@@ -17,7 +17,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # שומר: אחרי הגמר (20.7.2026) ריצות מתוזמנות נעצרות מעצמן.
+  # push ידני / הרצה ידנית תמיד ירוצו.
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(date -u +%Y%m%d)" -gt "20260720" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "המונדיאל הסתיים — מדלג על העדכון המתוזמן."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build-deploy:
+    needs: guard
+    if: needs.guard.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
