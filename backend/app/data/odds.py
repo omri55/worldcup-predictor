@@ -35,10 +35,17 @@ def _norm(name: str) -> str:
     return _TEAM_MAP.get(name, name)
 
 
+# Pinnacle is the "sharpest" book (lowest margin, most accurate lines), so its
+# de-vigged probabilities get extra weight in the average.
+_SHARP_BOOK = "Pinnacle"
+_SHARP_WEIGHT = 4.0
+
+
 def _devig_match(bookmakers: list[dict], home: str, away: str) -> dict | None:
-    """Average de-vigged 1X2 probabilities across all bookmakers for one match."""
+    """Weighted-average de-vigged 1X2 probabilities across bookmakers."""
     sums = {"home": 0.0, "draw": 0.0, "away": 0.0}
-    count = 0
+    total_w = 0.0
+    n = 0
     for bk in bookmakers:
         h2h = next((m for m in bk.get("markets", []) if m["key"] == "h2h"), None)
         if not h2h:
@@ -55,17 +62,19 @@ def _devig_match(bookmakers: list[dict], home: str, away: str) -> dict | None:
         total = sum(imp.values())
         if total <= 0:
             continue
+        w = _SHARP_WEIGHT if bk.get("title") == _SHARP_BOOK else 1.0
         for k in sums:
-            sums[k] += imp[k] / total
-        count += 1
+            sums[k] += (imp[k] / total) * w
+        total_w += w
+        n += 1
 
-    if count == 0:
+    if total_w == 0:
         return None
     return {
-        "home": round(sums["home"] / count, 4),
-        "draw": round(sums["draw"] / count, 4),
-        "away": round(sums["away"] / count, 4),
-        "bookmakers": count,
+        "home": round(sums["home"] / total_w, 4),
+        "draw": round(sums["draw"] / total_w, 4),
+        "away": round(sums["away"] / total_w, 4),
+        "bookmakers": n,
     }
 
 

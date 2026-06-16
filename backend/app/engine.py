@@ -24,6 +24,9 @@ from .models.elo import EloModel
 from .models.predictor import MatchPrediction, Predictor
 from .models.simulator import TournamentSimulator
 
+# 2026 World Cup host nations — they play with home advantage in their country.
+HOST_NATIONS = {"United States", "Mexico", "Canada"}
+
 
 class Engine:
     def __init__(self) -> None:
@@ -106,7 +109,7 @@ class Engine:
         out = []
         for row in fx.itertuples(index=False):
             stage = self._stage_for(row)
-            pred = self._predict(row.home_team, row.away_team, neutral=True, stage=stage)
+            pred = self._predict(row.home_team, row.away_team, neutral=self._neutral_for(row), stage=stage)
             out.append(self._fixture_payload(row, pred, played=False))
         return out
 
@@ -131,7 +134,7 @@ class Engine:
         out = []
         for row in pl.itertuples(index=False):
             stage = self._stage_for(row)
-            pred = self._predict(row.home_team, row.away_team, neutral=True, stage=stage)
+            pred = self._predict(row.home_team, row.away_team, neutral=self._neutral_for(row), stage=stage)
             payload = self._fixture_payload(row, pred, played=True)
             actual_score = f"{int(row.home_score)}-{int(row.away_score)}"
             payload["actual"] = {
@@ -158,6 +161,13 @@ class Engine:
             "exact_hits": exact,
             "total": total,
         }
+
+    def _neutral_for(self, row) -> bool:
+        """Host nations (USA/Mexico/Canada) get home advantage in their own
+        country; every other World Cup match is treated as neutral."""
+        if row.home_team in HOST_NATIONS and getattr(row, "country", None) == row.home_team:
+            return False
+        return True
 
     def _stage_for(self, row) -> str:
         """Tournament stage of a WC match (group/r32/r16/qf/sf/third/final)."""

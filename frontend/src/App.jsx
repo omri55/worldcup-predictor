@@ -117,7 +117,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>⚽ חיזוי מונדיאל 2026</h1>
+        <h1><span className="logo-emoji">⚽</span> חיזוי מונדיאל 2026</h1>
         <p className="tagline">
           Dixon-Coles + Elo + שוק ההימורים · {status?.matches_in_training?.toLocaleString() ?? "…"} משחקים באימון
         </p>
