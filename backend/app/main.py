@@ -77,16 +77,7 @@ def worldcup_upcoming(year: int = 2026):
 
 @app.get("/api/worldcup/played")
 def worldcup_played(year: int = 2026):
-    matches = engine.played_world_cup(year)
-    hits = sum(1 for m in matches if m.get("prediction_hit"))
-    accuracy = round(hits / len(matches), 3) if matches else None
-    return {
-        "year": year,
-        "matches": matches,
-        "model_accuracy_so_far": accuracy,
-        "hits": hits,
-        "total": len(matches),
-    }
+    return {"year": year, **engine.played_payload(year)}
 
 
 @app.get("/api/worldcup/simulation")

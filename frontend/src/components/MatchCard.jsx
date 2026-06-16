@@ -132,7 +132,11 @@ export default function MatchCard({ match, aggressive = false }) {
 
       {actual && (
         <div className={`hit ${match.prediction_hit ? "hit-yes" : "hit-no"}`}>
-          {match.prediction_hit ? "✓ החיזוי צדק" : "✗ החיזוי פספס"}
+          {match.exact_hit
+            ? "🎯 תוצאה מדויקת!"
+            : match.prediction_hit
+            ? "✓ כיוון נכון"
+            : "✗ פספוס"}
         </div>
       )}
     </div>

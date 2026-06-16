@@ -175,8 +175,16 @@ export default function App() {
               <div>
                 {played.model_accuracy_so_far != null && (
                   <div className="accuracy-banner">
-                    דיוק המודל עד כה: <b>{(played.model_accuracy_so_far * 100).toFixed(0)}%</b>
-                    {" "}({played.hits}/{played.total} משחקים)
+                    <div className="acc-metric">
+                      <span className="acc-label">דיוק כיוון (מי ניצח/תיקו)</span>
+                      <b>{(played.model_accuracy_so_far * 100).toFixed(0)}%</b>
+                      <span className="acc-sub">{played.hits}/{played.total}</span>
+                    </div>
+                    <div className="acc-metric">
+                      <span className="acc-label">דיוק תוצאה מדויקת</span>
+                      <b>{(played.exact_accuracy * 100).toFixed(0)}%</b>
+                      <span className="acc-sub">{played.exact_hits}/{played.total}</span>
+                    </div>
                   </div>
                 )}
                 <div className="grid">

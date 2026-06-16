@@ -133,14 +133,31 @@ class Engine:
             stage = self._stage_for(row)
             pred = self._predict(row.home_team, row.away_team, neutral=True, stage=stage)
             payload = self._fixture_payload(row, pred, played=True)
+            actual_score = f"{int(row.home_score)}-{int(row.away_score)}"
             payload["actual"] = {
                 "home_score": int(row.home_score),
                 "away_score": int(row.away_score),
-                "score": f"{int(row.home_score)}-{int(row.away_score)}",
+                "score": actual_score,
             }
-            payload["prediction_hit"] = self._hit(row, pred)
+            payload["prediction_hit"] = self._hit(row, pred)          # direction
+            payload["exact_hit"] = pred.pick_score == actual_score    # exact score
             out.append(payload)
         return out
+
+    def played_payload(self, year: int = 2026) -> dict:
+        """Played matches + both accuracy metrics (direction and exact score)."""
+        matches = self.played_world_cup(year)
+        total = len(matches)
+        hits = sum(1 for m in matches if m.get("prediction_hit"))
+        exact = sum(1 for m in matches if m.get("exact_hit"))
+        return {
+            "matches": matches,
+            "model_accuracy_so_far": round(hits / total, 3) if total else None,
+            "exact_accuracy": round(exact / total, 3) if total else None,
+            "hits": hits,
+            "exact_hits": exact,
+            "total": total,
+        }
 
     def _stage_for(self, row) -> str:
         """Tournament stage of a WC match (group/r32/r16/qf/sf/third/final)."""

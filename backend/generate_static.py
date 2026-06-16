@@ -29,7 +29,7 @@ def main() -> None:
             "matches": engine.upcoming_world_cup(2026),
             "awaiting_result": engine.awaiting_world_cup(2026),
         },
-        "played": _played_payload(),
+        "played": engine.played_payload(2026),
         "simulation": engine.simulate(4000),
     }
 
@@ -50,17 +50,6 @@ def main() -> None:
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     size_kb = OUT.stat().st_size / 1024
     print(f"Wrote {OUT} ({size_kb:.0f} KB, {len(predict)} matchups)")
-
-
-def _played_payload() -> dict:
-    matches = engine.played_world_cup(2026)
-    hits = sum(1 for m in matches if m.get("prediction_hit"))
-    return {
-        "matches": matches,
-        "model_accuracy_so_far": round(hits / len(matches), 3) if matches else None,
-        "hits": hits,
-        "total": len(matches),
-    }
 
 
 if __name__ == "__main__":

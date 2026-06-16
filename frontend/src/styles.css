@@ -223,11 +223,16 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 .rank-elo { color: var(--accent-2); font-weight: 700; }
 
 .accuracy-banner {
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 14px; text-align: center;
-  margin-bottom: 18px; font-size: 1rem;
+  display: flex; gap: 12px; margin-bottom: 18px;
 }
-.accuracy-banner b { color: var(--accent); font-size: 1.3rem; }
+.acc-metric {
+  flex: 1; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 14px; text-align: center;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.acc-label { font-size: 0.8rem; color: var(--muted); }
+.acc-metric b { color: var(--accent); font-size: 1.6rem; }
+.acc-sub { font-size: 0.75rem; color: var(--muted); }
 
 .sim-head {
   display: flex; justify-content: space-between; align-items: flex-start;
