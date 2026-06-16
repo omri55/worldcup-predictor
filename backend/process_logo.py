@@ -18,6 +18,20 @@ def trim_to_content(im):
     return rgb.crop(box) if box else rgb
 
 
+def remove_fifa(im):
+    """Paint out the white 'FIFA' wordmark (it sits in black, so fill it black)."""
+    import numpy as np
+
+    arr = np.array(im)
+    h, w, _ = arr.shape
+    # This band (below the gold base, central column) is solid black except the
+    # white "FIFA" wordmark — so fill it black entirely to erase it cleanly.
+    y0, y1 = int(h * 0.785), int(h * 0.935)
+    x0, x1 = int(w * 0.17), int(w * 0.83)
+    arr[y0:y1, x0:x1] = (0, 0, 0)
+    return Image.fromarray(arr)
+
+
 def square_pad(im, pad_ratio=0.1):
     side = max(im.size)
     pad = int(side * pad_ratio)
@@ -27,7 +41,7 @@ def square_pad(im, pad_ratio=0.1):
 
 
 def main():
-    logo = square_pad(trim_to_content(Image.open(SRC)))
+    logo = square_pad(remove_fifa(trim_to_content(Image.open(SRC))))
     OUT.mkdir(parents=True, exist_ok=True)
     for size, name in {512: "icon-512.png", 192: "icon-192.png",
                        180: "apple-touch-icon.png", 64: "favicon.png"}.items():
