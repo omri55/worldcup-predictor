@@ -1,7 +1,6 @@
 import ProbBar from "./ProbBar.jsx";
 import { chosenPick } from "../pickMode.js";
-
-const flag = (team) => team; // placeholder for future flag emojis
+import { flag } from "../flags.js";
 
 function outcomeLabel(outcome, home, away) {
   if (outcome === "home") return `ניצחון ${home}`;
@@ -41,7 +40,7 @@ export default function MatchCard({ match, aggressive = false }) {
 
       <div className="match-teams">
         <div className="team team-home">
-          <span className="team-name">{flag(match.home_team)}</span>
+          <span className="team-name"><span className="flag">{flag(match.home_team)}</span> {match.home_team}</span>
           <span className="team-elo">Elo {p.elo_home}</span>
         </div>
         <div className="match-score">
@@ -55,7 +54,7 @@ export default function MatchCard({ match, aggressive = false }) {
           </span>
         </div>
         <div className="team team-away">
-          <span className="team-name">{flag(match.away_team)}</span>
+          <span className="team-name"><span className="flag">{flag(match.away_team)}</span> {match.away_team}</span>
           <span className="team-elo">Elo {p.elo_away}</span>
         </div>
       </div>

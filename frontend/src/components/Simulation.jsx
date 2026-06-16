@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { flag } from "../flags.js";
 
 const pct = (x) => `${(x * 100).toFixed(x >= 0.1 ? 0 : 1)}%`;
 
@@ -71,7 +72,7 @@ export default function Simulation() {
             {teams.map((t, i) => (
               <tr key={t.team}>
                 <td className="dim">{i + 1}</td>
-                <td className="team-cell">{t.team}</td>
+                <td className="team-cell"><span className="flag">{flag(t.team)}</span> {t.team}</td>
                 <td className="dim">{t.group}</td>
                 <td>{pct(t.advance)}</td>
                 <td>{pct(t.reach_qf)}</td>

@@ -5,6 +5,7 @@ import PredictTool from "./components/PredictTool.jsx";
 import Simulation from "./components/Simulation.jsx";
 import Picks from "./components/Picks.jsx";
 import About from "./components/About.jsx";
+import { flag } from "./flags.js";
 
 function AwaitingNote({ awaiting }) {
   if (!awaiting.length) return null;
@@ -59,7 +60,7 @@ function Ranking({ ranking }) {
         {ranking.map((r) => (
           <li key={r.team}>
             <span className="rank-num">{r.rank}</span>
-            <span className="rank-team">{r.team}</span>
+            <span className="rank-team"><span className="flag">{flag(r.team)}</span> {r.team}</span>
             <span className="rank-elo">{r.elo}</span>
           </li>
         ))}

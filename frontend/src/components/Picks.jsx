@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { chosenPick } from "../pickMode.js";
+import { flag } from "../flags.js";
 
 function outcomeLabel(o, home, away) {
   if (o === "home") return home;
@@ -107,7 +108,7 @@ export default function Picks({ matches, aggressive = false }) {
                 return (
                   <tr key={`${m.home_team}-${i}`}>
                     <td className="pk-match">
-                      <span dir="ltr">{m.home_team} – {m.away_team}</span>
+                      <span dir="ltr">{flag(m.home_team)} {m.home_team} – {m.away_team} {flag(m.away_team)}</span>
                     </td>
                     <td className={`pk-score ${pick.isGamble ? "pk-gamble" : ""}`} dir="ltr">
                       {pick.score}{pick.isGamble ? " 🔥" : ""}
