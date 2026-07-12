@@ -18,6 +18,7 @@ from .data.loader import (
     world_cup_fixtures,
     world_cup_played,
 )
+from .config import settings
 from .data.odds import load_market_odds, market_for
 from .models.dixon_coles import DixonColesModel
 from .models.elo import EloModel
@@ -144,8 +145,29 @@ class Engine:
             }
             payload["prediction_hit"] = self._hit(row, pred)          # direction
             payload["exact_hit"] = pred.pick_score == actual_score    # exact score
+            # points the model would score in the league (entering its pick)
+            pts, mx = self._league_points(pred, row, actual_score)
+            payload["points_earned"] = pts
+            payload["points_max"] = mx
             out.append(payload)
         return out
+
+    @staticmethod
+    def _league_points(pred: MatchPrediction, row, actual_score: str) -> tuple[int, int]:
+        """Points the model's pick earns under the league's per-stage scoring."""
+        scoring = settings.prediction_scoring.get(
+            pred.stage, settings.prediction_scoring[settings.default_stage]
+        )
+        actual_dir = (
+            "home" if row.home_score > row.away_score
+            else "away" if row.home_score < row.away_score
+            else "draw"
+        )
+        if pred.pick_score == actual_score:
+            return scoring["exact"], scoring["exact"]
+        if pred.pick_outcome == actual_dir:
+            return scoring["direction"], scoring["exact"]
+        return 0, scoring["exact"]
 
     def played_payload(self, year: int = 2026) -> dict:
         """Played matches + both accuracy metrics (direction and exact score)."""
@@ -153,6 +175,8 @@ class Engine:
         total = len(matches)
         hits = sum(1 for m in matches if m.get("prediction_hit"))
         exact = sum(1 for m in matches if m.get("exact_hit"))
+        points = sum(m.get("points_earned", 0) for m in matches)
+        points_max = sum(m.get("points_max", 0) for m in matches)
         return {
             "matches": matches,
             "model_accuracy_so_far": round(hits / total, 3) if total else None,
@@ -160,6 +184,8 @@ class Engine:
             "hits": hits,
             "exact_hits": exact,
             "total": total,
+            "points": points,
+            "points_max": points_max,
         }
 
     def _neutral_for(self, row) -> bool:

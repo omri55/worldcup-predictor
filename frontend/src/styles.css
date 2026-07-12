@@ -246,7 +246,11 @@ body {
   padding: 3px 8px; border-radius: 6px; font-size: 0.75rem;
 }
 
-.hit { margin-top: 10px; text-align: center; font-size: 0.8rem; padding: 5px; border-radius: 6px; }
+.hit {
+  margin-top: 10px; font-size: 0.8rem; padding: 6px 10px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.hit-pts { font-weight: 800; color: var(--accent-2); }
 .hit-yes { background: rgba(216,178,76,0.15); color: #f0dca0; }
 .hit-no { background: rgba(244,63,94,0.15); color: #fda4af; }
 
@@ -286,6 +290,21 @@ button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
 .rank-num { width: 28px; color: var(--muted); font-weight: 700; }
 .rank-team { flex: 1; font-weight: 600; }
 .rank-elo { color: var(--accent-2); font-weight: 700; }
+
+.points-banner {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background:
+    linear-gradient(180deg, rgba(216,178,76,0.18), rgba(216,178,76,0.05));
+  border: 1px solid rgba(216,178,76,0.45);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.points-label { font-size: 0.85rem; color: #efe2b0; font-weight: 700; }
+.points-value {
+  font-size: 2.6rem; font-weight: 900; color: var(--accent-2); line-height: 1;
+  text-shadow: 0 0 26px rgba(216,178,76,0.4);
+}
+.points-sub { font-size: 0.8rem; color: var(--muted); }
 
 .accuracy-banner {
   display: flex; gap: 12px; margin-bottom: 18px;

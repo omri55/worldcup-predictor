@@ -131,11 +131,16 @@ export default function MatchCard({ match, aggressive = false }) {
 
       {actual && (
         <div className={`hit ${match.prediction_hit ? "hit-yes" : "hit-no"}`}>
-          {match.exact_hit
-            ? "🎯 תוצאה מדויקת!"
-            : match.prediction_hit
-            ? "✓ כיוון נכון"
-            : "✗ פספוס"}
+          <span>
+            {match.exact_hit
+              ? "🎯 תוצאה מדויקת!"
+              : match.prediction_hit
+              ? "✓ כיוון נכון"
+              : "✗ פספוס"}
+          </span>
+          {match.points_earned != null && (
+            <span className="hit-pts">+{match.points_earned} נק'</span>
+          )}
         </div>
       )}
     </div>

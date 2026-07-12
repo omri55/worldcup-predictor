@@ -175,18 +175,27 @@ export default function App() {
             {tab === "played" && played && (
               <div>
                 {played.model_accuracy_so_far != null && (
-                  <div className="accuracy-banner">
-                    <div className="acc-metric">
-                      <span className="acc-label">דיוק כיוון (מי ניצח/תיקו)</span>
-                      <b>{(played.model_accuracy_so_far * 100).toFixed(0)}%</b>
-                      <span className="acc-sub">{played.hits}/{played.total}</span>
+                  <>
+                    <div className="points-banner">
+                      <span className="points-label">🏆 המודל צבר בליגה</span>
+                      <span className="points-value">{played.points}</span>
+                      <span className="points-sub">
+                        נקודות מתוך {played.points_max} אפשריות ({played.total} משחקים)
+                      </span>
                     </div>
-                    <div className="acc-metric">
-                      <span className="acc-label">דיוק תוצאה מדויקת</span>
-                      <b>{(played.exact_accuracy * 100).toFixed(0)}%</b>
-                      <span className="acc-sub">{played.exact_hits}/{played.total}</span>
+                    <div className="accuracy-banner">
+                      <div className="acc-metric">
+                        <span className="acc-label">דיוק כיוון (מי ניצח/תיקו)</span>
+                        <b>{(played.model_accuracy_so_far * 100).toFixed(0)}%</b>
+                        <span className="acc-sub">{played.hits}/{played.total}</span>
+                      </div>
+                      <div className="acc-metric">
+                        <span className="acc-label">דיוק תוצאה מדויקת</span>
+                        <b>{(played.exact_accuracy * 100).toFixed(0)}%</b>
+                        <span className="acc-sub">{played.exact_hits}/{played.total}</span>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
                 <div className="grid">
                   {played.matches.length === 0 && <p>עדיין לא שוחקו משחקי מונדיאל.</p>}
