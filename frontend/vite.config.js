@@ -1,11 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  // Relative base so the build works under any GitHub Pages subpath
-  // (e.g. https://user.github.io/worldcup-predictor/) without hardcoding it.
-  base: "./",
+  // Absolute base for the GitHub Pages build so every asset + data.json + the
+  // service worker resolve to the correct path even inside a standalone iOS PWA
+  // (a relative "./" base breaks there when the URL has no trailing slash).
+  base: command === "build" ? "/worldcup-predictor/" : "/",
   server: {
     port: 5173,
     host: true, // listen on all interfaces (LAN + tunnel access)
@@ -16,4 +17,4 @@ export default defineConfig({
       "/api": "http://127.0.0.1:8000",
     },
   },
-});
+}));
