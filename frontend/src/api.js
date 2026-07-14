@@ -11,14 +11,28 @@ async function getDev(path) {
   return res.json();
 }
 
-let _cache = null;
-async function loadStatic() {
-  if (!_cache) {
-    const res = await fetch(`${import.meta.env.BASE_URL}data.json`);
-    if (!res.ok) throw new Error("data.json load failed");
-    _cache = await res.json();
+// Load data.json once, shared across all callers, with automatic retries so a
+// transient network hiccup (or a mid-deploy moment) doesn't break the app.
+let _promise = null;
+function loadStatic() {
+  if (!_promise) _promise = fetchWithRetry();
+  return _promise;
+}
+
+async function fetchWithRetry(attempts = 4) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}data.json`);
+      if (!res.ok) throw new Error(`data.json ${res.status}`);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, 700 * (i + 1)));
+    }
   }
-  return _cache;
+  _promise = null; // allow a later call to try again
+  throw lastErr;
 }
 
 export const api = {

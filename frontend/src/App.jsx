@@ -108,7 +108,7 @@ export default function App() {
         setPlayed(pl);
         setRanking(rk.ranking);
       } catch (e) {
-        setError("השרת עדיין מתאמן או לא זמין. נסה לרענן בעוד דקה.");
+        setError("לא הצלחנו לטעון את הנתונים — בדוק את חיבור האינטרנט ונסה לרענן.");
       } finally {
         setLoading(false);
       }
@@ -142,8 +142,13 @@ export default function App() {
       </nav>
 
       <main className="content">
-        {loading && <div className="loading">טוען חיזויים… (האימון הראשוני יכול לקחת דקה)</div>}
-        {error && <div className="error">{error}</div>}
+        {loading && <div className="loading">טוען חיזויים…</div>}
+        {error && (
+          <div className="error">
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()}>רענן</button>
+          </div>
+        )}
 
         {!loading && !error && (
           <>
