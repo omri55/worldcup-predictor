@@ -9,11 +9,24 @@ Output: frontend/public/data.json
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from app.engine import engine, _pred_dict
 
 OUT = Path(__file__).resolve().parent.parent / "frontend" / "public" / "data.json"
+
+
+def _clean(obj):
+    """Recursively replace NaN/Infinity floats with None so the JSON is valid
+    (JavaScript's JSON.parse rejects NaN, which Python otherwise emits)."""
+    if isinstance(obj, float):
+        return obj if math.isfinite(obj) else None
+    if isinstance(obj, dict):
+        return {k: _clean(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_clean(v) for v in obj]
+    return obj
 
 
 def main() -> None:
@@ -47,7 +60,11 @@ def main() -> None:
     data["wc_teams"] = wc_teams
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+    # allow_nan=False guarantees valid JSON (raises loudly if any NaN slips past
+    # _clean, instead of silently shipping a file the browser can't parse).
+    OUT.write_text(
+        json.dumps(_clean(data), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+    )
     size_kb = OUT.stat().st_size / 1024
     print(f"Wrote {OUT} ({size_kb:.0f} KB, {len(predict)} matchups)")
 

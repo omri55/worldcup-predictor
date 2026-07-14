@@ -63,6 +63,9 @@ def load_datasets(force: bool = False) -> Datasets:
     raw = fetch_csv(settings.results_url, force=force)
     raw["date"] = pd.to_datetime(raw["date"], errors="coerce")
     raw = raw.dropna(subset=["date"])
+    # Drop TBD fixtures (e.g. the final before the semis are decided) whose team
+    # names are still blank — we can't predict them and NaN breaks JSON.
+    raw = raw.dropna(subset=["home_team", "away_team"])
     raw["neutral"] = raw["neutral"].astype(str).str.upper().eq("TRUE")
 
     played_mask = raw["home_score"].notna() & raw["away_score"].notna()
